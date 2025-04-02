@@ -1,30 +1,62 @@
-# GMAT-OrbitalManeuvers
+# GMAT Orbital Maneuvers
 
-A growing set of orbital mission setups built using GMAT (General Mission Analysis Tool).  
-Includes simulations of orbital transfers like Hohmann and bi-elliptic maneuvers to GEO, with visualizations, maneuver setup, and mission planning via GMAT’s Mission Sequence.
+This repo is a growing set of orbital mission setups using GMAT (General Mission Analysis Tool).  
+The goal is to get hands-on with real mission planning tools, building on earlier work with a custom Unity and C++ orbital simulator.
 
-This repo is starting small as I get more familiar with the GMAT software. Right now it's focused on basic transfers using manual propagation and impulsive burns. As I learn more, I plan to add targets, solvers, and more complex mission setups for higher accuracy and realism.
+Instead of scripting everything from scratch, this project focuses on using a real mission design tool like GMAT to plan, propagate, and analyze spaceflight maneuvers. This includes burn sequencing, targeting, and eventually full mission flows.
 
 ---
 
-## How to Run the Simulation
+## What this is
 
-1. Open GMAT
-2. Load the script file:  
-   Go to `File` → `Open` and select the mission script file.
-3. Run the mission:  
-   Press the blue Play button. GMAT will execute the mission sequence.
-4. View the plots:  
-   - XYPlot windows will open automatically showing altitude over time.
-   - OrbitView will display 3D orbits for both spacecraft.
-5. Check the report data:  
-   - Go to the **Output** tab in GMAT.
-   - Click on `Hohmann_Report` and `BiElliptic_Report` to view mission data for each transfer.
+Right now the repo includes some starter mission scripts like:
+
+- Hohmann transfer to GEO
+- Bi elliptic transfer to GEO
+- OrbitView and XYPlot visualizations
+- Report data for altitude, RMAG, and velocity
+- Manual impulsive burns with idealized inputs
+
+This is the early phase. The point was to get used to GMAT’s scripting structure and mission sequence flow.
+
+---
+
+## Why GMAT
+
+Before this, I built a real time orbital mechanics simulator in Unity using C++ for the physics core. That one had RK4 integration, full N body gravity, thrust vectoring, and time scaled maneuvering, all real time and GPU drawn.
+
+But those were hand built systems. This repo is about learning how to use a real industry style tool, how to build proper missions, and how to hit constraints with tools like solvers and targeters.
+
+GMAT is used by actual space agencies and flight engineers. Learning how to script with it, not just click around the GUI, is part of the goal.
+
+---
+
+## How to run the sims
+
+1. Open GMAT  
+2. Load the script file from this repo  
+3. Press the blue Play button  
+4. Wait for plots to show up (OrbitView and XYPlot)  
+5. Check the Output tab for report files like `Hohmann_Report` and `BiElliptic_Report`
+
+---
+
+## In progress
+
+Right now I’m working on a full lunar mission script that includes:
+
+- Tanks and engine modeling  
+- Mass decrementing over time  
+- Solver loops with vary and achieve blocks  
+- Targeting lunar orbit entry and return to LEO  
+- All burns auto targeted by constraints (no hand tuning)
+
+This will be a full LEO to LLO transfer and return.
 
 ---
 
 ## Notes
 
-- All maneuvers are impulsive burns.
-- No mass decrementing is used.
-- Starting conditions are idealized for simplicity.
+- All current burns are ideal impulsive  
+- Mass is static for now (that changes soon)  
+- No external forces yet (SRP, drag, third body)
