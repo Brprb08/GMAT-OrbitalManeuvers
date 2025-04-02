@@ -1,0 +1,330 @@
+%General Mission Analysis Tool(GMAT) Script
+%Created: 2025-04-01 15:01:23
+
+
+%----------------------------------------
+%---------- Spacecraft
+%----------------------------------------
+
+Create Spacecraft HohmannCraft;
+GMAT HohmannCraft.DateFormat = TAIModJulian;
+GMAT HohmannCraft.Epoch = '21545';
+GMAT HohmannCraft.CoordinateSystem = EarthMJ2000Eq;
+GMAT HohmannCraft.DisplayStateType = Keplerian;
+GMAT HohmannCraft.SMA = 7000;
+GMAT HohmannCraft.ECC = 0;
+GMAT HohmannCraft.INC = 0;
+GMAT HohmannCraft.RAAN = 0;
+GMAT HohmannCraft.AOP = 0;
+GMAT HohmannCraft.TA = 0;
+GMAT HohmannCraft.DryMass = 850;
+GMAT HohmannCraft.Cd = 2.2;
+GMAT HohmannCraft.Cr = 1.8;
+GMAT HohmannCraft.DragArea = 15;
+GMAT HohmannCraft.SRPArea = 1;
+GMAT HohmannCraft.SPADDragScaleFactor = 1;
+GMAT HohmannCraft.SPADSRPScaleFactor = 1;
+GMAT HohmannCraft.AtmosDensityScaleFactor = 1;
+GMAT HohmannCraft.ExtendedMassPropertiesModel = 'None';
+GMAT HohmannCraft.NAIFId = -10000001;
+GMAT HohmannCraft.NAIFIdReferenceFrame = -9000001;
+GMAT HohmannCraft.OrbitColor = Red;
+GMAT HohmannCraft.TargetColor = Teal;
+GMAT HohmannCraft.OrbitErrorCovariance = [ 1e+70 0 0 0 0 0 ; 0 1e+70 0 0 0 0 ; 0 0 1e+70 0 0 0 ; 0 0 0 1e+70 0 0 ; 0 0 0 0 1e+70 0 ; 0 0 0 0 0 1e+70 ];
+GMAT HohmannCraft.CdSigma = 1e+70;
+GMAT HohmannCraft.CrSigma = 1e+70;
+GMAT HohmannCraft.Id = 'SatId';
+GMAT HohmannCraft.Attitude = CoordinateSystemFixed;
+GMAT HohmannCraft.SPADSRPInterpolationMethod = Bilinear;
+GMAT HohmannCraft.SPADSRPScaleFactorSigma = 1e+70;
+GMAT HohmannCraft.SPADDragInterpolationMethod = Bilinear;
+GMAT HohmannCraft.SPADDragScaleFactorSigma = 1e+70;
+GMAT HohmannCraft.AtmosDensityScaleFactorSigma = 1e+70;
+GMAT HohmannCraft.ModelFile = 'aura.3ds';
+GMAT HohmannCraft.ModelOffsetX = 0;
+GMAT HohmannCraft.ModelOffsetY = 0;
+GMAT HohmannCraft.ModelOffsetZ = 0;
+GMAT HohmannCraft.ModelRotationX = 0;
+GMAT HohmannCraft.ModelRotationY = 0;
+GMAT HohmannCraft.ModelRotationZ = 0;
+GMAT HohmannCraft.ModelScale = 1;
+GMAT HohmannCraft.AttitudeDisplayStateType = 'Quaternion';
+GMAT HohmannCraft.AttitudeRateDisplayStateType = 'AngularVelocity';
+GMAT HohmannCraft.AttitudeCoordinateSystem = EarthMJ2000Eq;
+GMAT HohmannCraft.EulerAngleSequence = '321';
+
+Create Spacecraft BiEllipticCraft;
+GMAT BiEllipticCraft.DateFormat = TAIModJulian;
+GMAT BiEllipticCraft.Epoch = '21545';
+GMAT BiEllipticCraft.CoordinateSystem = EarthMJ2000Eq;
+GMAT BiEllipticCraft.DisplayStateType = Keplerian;
+GMAT BiEllipticCraft.SMA = 7200.000000000003;
+GMAT BiEllipticCraft.ECC = 7.70080586697903e-16;
+GMAT BiEllipticCraft.INC = 0.2000000000016346;
+GMAT BiEllipticCraft.RAAN = 0;
+GMAT BiEllipticCraft.AOP = 0;
+GMAT BiEllipticCraft.TA = 0;
+GMAT BiEllipticCraft.DryMass = 850;
+GMAT BiEllipticCraft.Cd = 2.2;
+GMAT BiEllipticCraft.Cr = 1.8;
+GMAT BiEllipticCraft.DragArea = 15;
+GMAT BiEllipticCraft.SRPArea = 1;
+GMAT BiEllipticCraft.SPADDragScaleFactor = 1;
+GMAT BiEllipticCraft.SPADSRPScaleFactor = 1;
+GMAT BiEllipticCraft.AtmosDensityScaleFactor = 1;
+GMAT BiEllipticCraft.ExtendedMassPropertiesModel = 'None';
+GMAT BiEllipticCraft.NAIFId = -10001001;
+GMAT BiEllipticCraft.NAIFIdReferenceFrame = -9001001;
+GMAT BiEllipticCraft.OrbitColor = Green;
+GMAT BiEllipticCraft.TargetColor = LightGray;
+GMAT BiEllipticCraft.OrbitErrorCovariance = [ 1e+70 0 0 0 0 0 ; 0 1e+70 0 0 0 0 ; 0 0 1e+70 0 0 0 ; 0 0 0 1e+70 0 0 ; 0 0 0 0 1e+70 0 ; 0 0 0 0 0 1e+70 ];
+GMAT BiEllipticCraft.CdSigma = 1e+70;
+GMAT BiEllipticCraft.CrSigma = 1e+70;
+GMAT BiEllipticCraft.Id = 'SatId';
+GMAT BiEllipticCraft.Attitude = CoordinateSystemFixed;
+GMAT BiEllipticCraft.SPADSRPInterpolationMethod = Bilinear;
+GMAT BiEllipticCraft.SPADSRPScaleFactorSigma = 1e+70;
+GMAT BiEllipticCraft.SPADDragInterpolationMethod = Bilinear;
+GMAT BiEllipticCraft.SPADDragScaleFactorSigma = 1e+70;
+GMAT BiEllipticCraft.AtmosDensityScaleFactorSigma = 1e+70;
+GMAT BiEllipticCraft.ModelFile = 'aura.3ds';
+GMAT BiEllipticCraft.ModelOffsetX = 0;
+GMAT BiEllipticCraft.ModelOffsetY = 0;
+GMAT BiEllipticCraft.ModelOffsetZ = 0;
+GMAT BiEllipticCraft.ModelRotationX = 0;
+GMAT BiEllipticCraft.ModelRotationY = 0;
+GMAT BiEllipticCraft.ModelRotationZ = 0;
+GMAT BiEllipticCraft.ModelScale = 1;
+GMAT BiEllipticCraft.AttitudeDisplayStateType = 'Quaternion';
+GMAT BiEllipticCraft.AttitudeRateDisplayStateType = 'AngularVelocity';
+GMAT BiEllipticCraft.AttitudeCoordinateSystem = EarthMJ2000Eq;
+GMAT BiEllipticCraft.EulerAngleSequence = '321';
+
+
+%----------------------------------------
+%---------- ForceModels
+%----------------------------------------
+
+Create ForceModel DefaultProp_ForceModel;
+GMAT DefaultProp_ForceModel.CentralBody = Earth;
+GMAT DefaultProp_ForceModel.PrimaryBodies = {Earth};
+GMAT DefaultProp_ForceModel.Drag = None;
+GMAT DefaultProp_ForceModel.SRP = Off;
+GMAT DefaultProp_ForceModel.RelativisticCorrection = Off;
+GMAT DefaultProp_ForceModel.ErrorControl = RSSStep;
+GMAT DefaultProp_ForceModel.GravityField.Earth.Degree = 4;
+GMAT DefaultProp_ForceModel.GravityField.Earth.Order = 4;
+GMAT DefaultProp_ForceModel.GravityField.Earth.StmLimit = 100;
+GMAT DefaultProp_ForceModel.GravityField.Earth.PotentialFile = 'JGM2.cof';
+GMAT DefaultProp_ForceModel.GravityField.Earth.TideModel = 'None';
+
+%----------------------------------------
+%---------- Propagators
+%----------------------------------------
+
+Create Propagator DefaultProp;
+GMAT DefaultProp.FM = DefaultProp_ForceModel;
+GMAT DefaultProp.Type = RungeKutta89;
+GMAT DefaultProp.InitialStepSize = 60;
+GMAT DefaultProp.Accuracy = 9.999999999999999e-12;
+GMAT DefaultProp.MinStep = 0.001;
+GMAT DefaultProp.MaxStep = 2700;
+GMAT DefaultProp.MaxStepAttempts = 50;
+GMAT DefaultProp.StopIfAccuracyIsViolated = true;
+
+%----------------------------------------
+%---------- Burns
+%----------------------------------------
+
+Create ImpulsiveBurn HohmannGTOBurn;
+GMAT HohmannGTOBurn.CoordinateSystem = Local;
+GMAT HohmannGTOBurn.Origin = Earth;
+GMAT HohmannGTOBurn.Axes = VNB;
+GMAT HohmannGTOBurn.Element1 = 2.334353;
+GMAT HohmannGTOBurn.Element2 = 0;
+GMAT HohmannGTOBurn.Element3 = 0;
+GMAT HohmannGTOBurn.DecrementMass = false;
+GMAT HohmannGTOBurn.Isp = 300;
+GMAT HohmannGTOBurn.GravitationalAccel = 9.81;
+
+Create ImpulsiveBurn HohmannGEOEntryBurn;
+GMAT HohmannGEOEntryBurn.CoordinateSystem = Local;
+GMAT HohmannGEOEntryBurn.Origin = Earth;
+GMAT HohmannGEOEntryBurn.Axes = VNB;
+GMAT HohmannGEOEntryBurn.Element1 = 1.4354;
+GMAT HohmannGEOEntryBurn.Element2 = 0;
+GMAT HohmannGEOEntryBurn.Element3 = 0;
+GMAT HohmannGEOEntryBurn.DecrementMass = false;
+GMAT HohmannGEOEntryBurn.Isp = 300;
+GMAT HohmannGEOEntryBurn.GravitationalAccel = 9.81;
+
+Create ImpulsiveBurn BiEllipticApogeeRaiseBurn;
+GMAT BiEllipticApogeeRaiseBurn.CoordinateSystem = Local;
+GMAT BiEllipticApogeeRaiseBurn.Origin = Earth;
+GMAT BiEllipticApogeeRaiseBurn.Axes = VNB;
+GMAT BiEllipticApogeeRaiseBurn.Element1 = 2.8;
+GMAT BiEllipticApogeeRaiseBurn.Element2 = 0;
+GMAT BiEllipticApogeeRaiseBurn.Element3 = 0;
+GMAT BiEllipticApogeeRaiseBurn.DecrementMass = false;
+GMAT BiEllipticApogeeRaiseBurn.Isp = 300;
+GMAT BiEllipticApogeeRaiseBurn.GravitationalAccel = 9.81;
+
+Create ImpulsiveBurn BiEllipticPerigeeRaiseBurn;
+GMAT BiEllipticPerigeeRaiseBurn.CoordinateSystem = Local;
+GMAT BiEllipticPerigeeRaiseBurn.Origin = Earth;
+GMAT BiEllipticPerigeeRaiseBurn.Axes = VNB;
+GMAT BiEllipticPerigeeRaiseBurn.Element1 = 0.6666218;
+GMAT BiEllipticPerigeeRaiseBurn.Element2 = 0;
+GMAT BiEllipticPerigeeRaiseBurn.Element3 = 0;
+GMAT BiEllipticPerigeeRaiseBurn.DecrementMass = false;
+GMAT BiEllipticPerigeeRaiseBurn.Isp = 300;
+GMAT BiEllipticPerigeeRaiseBurn.GravitationalAccel = 9.81;
+
+Create ImpulsiveBurn BiEllipticCircularizeBurn;
+GMAT BiEllipticCircularizeBurn.CoordinateSystem = Local;
+GMAT BiEllipticCircularizeBurn.Origin = Earth;
+GMAT BiEllipticCircularizeBurn.Axes = VNB;
+GMAT BiEllipticCircularizeBurn.Element1 = -0.6961884;
+GMAT BiEllipticCircularizeBurn.Element2 = 0;
+GMAT BiEllipticCircularizeBurn.Element3 = 0;
+GMAT BiEllipticCircularizeBurn.DecrementMass = false;
+GMAT BiEllipticCircularizeBurn.Isp = 300;
+GMAT BiEllipticCircularizeBurn.GravitationalAccel = 9.81;
+
+%----------------------------------------
+%---------- Solvers
+%----------------------------------------
+
+Create DifferentialCorrector DefaultDC;
+GMAT DefaultDC.ShowProgress = true;
+GMAT DefaultDC.ReportStyle = Normal;
+GMAT DefaultDC.ReportFile = 'DifferentialCorrectorDefaultDC.data';
+GMAT DefaultDC.MaximumIterations = 25;
+GMAT DefaultDC.DerivativeMethod = ForwardDifference;
+GMAT DefaultDC.Algorithm = NewtonRaphson;
+
+%----------------------------------------
+%---------- Subscribers
+%----------------------------------------
+
+Create OrbitView DefaultOrbitView;
+GMAT DefaultOrbitView.SolverIterations = Current;
+GMAT DefaultOrbitView.UpperLeft = [ 0.003088326127239036 0 ];
+GMAT DefaultOrbitView.Size = [ 0.8066707844348363 0.7872596153846154 ];
+GMAT DefaultOrbitView.RelativeZOrder = 362;
+GMAT DefaultOrbitView.Maximized = false;
+GMAT DefaultOrbitView.Add = {HohmannCraft, BiEllipticCraft, Earth};
+GMAT DefaultOrbitView.CoordinateSystem = EarthMJ2000Eq;
+GMAT DefaultOrbitView.DrawObject = [ true true true ];
+GMAT DefaultOrbitView.DataCollectFrequency = 1;
+GMAT DefaultOrbitView.UpdatePlotFrequency = 50;
+GMAT DefaultOrbitView.NumPointsToRedraw = 0;
+GMAT DefaultOrbitView.ShowPlot = true;
+GMAT DefaultOrbitView.MaxPlotPoints = 20000;
+GMAT DefaultOrbitView.ShowLabels = true;
+GMAT DefaultOrbitView.ViewPointReference = Earth;
+GMAT DefaultOrbitView.ViewPointVector = [ 30000 0 0 ];
+GMAT DefaultOrbitView.ViewDirection = Earth;
+GMAT DefaultOrbitView.ViewScaleFactor = 1;
+GMAT DefaultOrbitView.ViewUpCoordinateSystem = EarthMJ2000Eq;
+GMAT DefaultOrbitView.ViewUpAxis = Z;
+GMAT DefaultOrbitView.EclipticPlane = Off;
+GMAT DefaultOrbitView.XYPlane = Off;
+GMAT DefaultOrbitView.WireFrame = Off;
+GMAT DefaultOrbitView.Axes = Off;
+GMAT DefaultOrbitView.Grid = Off;
+GMAT DefaultOrbitView.SunLine = Off;
+GMAT DefaultOrbitView.UseInitialView = On;
+GMAT DefaultOrbitView.StarCount = 7000;
+GMAT DefaultOrbitView.EnableStars = Off;
+GMAT DefaultOrbitView.EnableConstellations = Off;
+
+Create GroundTrackPlot DefaultGroundTrackPlot;
+GMAT DefaultGroundTrackPlot.SolverIterations = Current;
+GMAT DefaultGroundTrackPlot.UpperLeft = [ 0.003088326127239036 0.453125 ];
+GMAT DefaultGroundTrackPlot.Size = [ 0.5262507720815318 0.4495192307692308 ];
+GMAT DefaultGroundTrackPlot.RelativeZOrder = 7;
+GMAT DefaultGroundTrackPlot.Maximized = false;
+GMAT DefaultGroundTrackPlot.Add = {HohmannCraft};
+GMAT DefaultGroundTrackPlot.DataCollectFrequency = 1;
+GMAT DefaultGroundTrackPlot.UpdatePlotFrequency = 50;
+GMAT DefaultGroundTrackPlot.NumPointsToRedraw = 0;
+GMAT DefaultGroundTrackPlot.ShowPlot = true;
+GMAT DefaultGroundTrackPlot.MaxPlotPoints = 20000;
+GMAT DefaultGroundTrackPlot.CentralBody = Earth;
+GMAT DefaultGroundTrackPlot.TextureMap = 'ModifiedBlueMarble.jpg';
+
+Create ReportFile BiElliptic_Report;
+GMAT BiElliptic_Report.SolverIterations = Current;
+GMAT BiElliptic_Report.UpperLeft = [ 0.1457689932056825 0.1021634615384615 ];
+GMAT BiElliptic_Report.Size = [ 0.5497220506485485 0.6850961538461539 ];
+GMAT BiElliptic_Report.RelativeZOrder = 333;
+GMAT BiElliptic_Report.Maximized = false;
+GMAT BiElliptic_Report.Filename = 'ReportFile1.txt';
+GMAT BiElliptic_Report.Precision = 16;
+GMAT BiElliptic_Report.Add = {BiEllipticCraft.ElapsedSecs, BiEllipticCraft.Earth.Altitude, BiEllipticCraft.Earth.RMAG, BiEllipticCraft.EarthMJ2000Eq.VMAG};
+GMAT BiElliptic_Report.WriteHeaders = true;
+GMAT BiElliptic_Report.LeftJustify = On;
+GMAT BiElliptic_Report.ZeroFill = Off;
+GMAT BiElliptic_Report.FixedWidth = true;
+GMAT BiElliptic_Report.Delimiter = ' ';
+GMAT BiElliptic_Report.ColumnWidth = 23;
+GMAT BiElliptic_Report.WriteReport = true;
+
+Create XYPlot Hohmann_AltitudeOverTimePlot;
+GMAT Hohmann_AltitudeOverTimePlot.SolverIterations = Current;
+GMAT Hohmann_AltitudeOverTimePlot.UpperLeft = [ 0.03644224830142063 0.5 ];
+GMAT Hohmann_AltitudeOverTimePlot.Size = [ 0.5003088326127239 0.4495192307692308 ];
+GMAT Hohmann_AltitudeOverTimePlot.RelativeZOrder = 360;
+GMAT Hohmann_AltitudeOverTimePlot.Maximized = false;
+GMAT Hohmann_AltitudeOverTimePlot.XVariable = HohmannCraft.ElapsedSecs;
+GMAT Hohmann_AltitudeOverTimePlot.YVariables = {HohmannCraft.Earth.Altitude};
+GMAT Hohmann_AltitudeOverTimePlot.ShowGrid = true;
+GMAT Hohmann_AltitudeOverTimePlot.ShowPlot = true;
+
+Create XYPlot BiElliptic_AltitudeOverTimePlot;
+GMAT BiElliptic_AltitudeOverTimePlot.SolverIterations = Current;
+GMAT BiElliptic_AltitudeOverTimePlot.UpperLeft = [ 0.3699814700432366 0.4579326923076923 ];
+GMAT BiElliptic_AltitudeOverTimePlot.Size = [ 0.5003088326127239 0.4495192307692308 ];
+GMAT BiElliptic_AltitudeOverTimePlot.RelativeZOrder = 176;
+GMAT BiElliptic_AltitudeOverTimePlot.Maximized = false;
+GMAT BiElliptic_AltitudeOverTimePlot.XVariable = BiEllipticCraft.ElapsedSecs;
+GMAT BiElliptic_AltitudeOverTimePlot.YVariables = {BiEllipticCraft.Earth.Altitude};
+GMAT BiElliptic_AltitudeOverTimePlot.ShowGrid = true;
+GMAT BiElliptic_AltitudeOverTimePlot.ShowPlot = true;
+
+Create ReportFile Hohmann_Report;
+GMAT Hohmann_Report.SolverIterations = Current;
+GMAT Hohmann_Report.UpperLeft = [ 0.1093267449042619 0.2127403846153846 ];
+GMAT Hohmann_Report.Size = [ 0.5960469425571341 0.7920673076923077 ];
+GMAT Hohmann_Report.RelativeZOrder = 356;
+GMAT Hohmann_Report.Maximized = false;
+GMAT Hohmann_Report.Filename = 'ReportFile2.txt';
+GMAT Hohmann_Report.Precision = 16;
+GMAT Hohmann_Report.Add = {HohmannCraft.ElapsedSecs, HohmannCraft.Earth.Altitude, HohmannCraft.Earth.RMAG, HohmannCraft.EarthMJ2000Eq.VMAG};
+GMAT Hohmann_Report.WriteHeaders = true;
+GMAT Hohmann_Report.LeftJustify = On;
+GMAT Hohmann_Report.ZeroFill = Off;
+GMAT Hohmann_Report.FixedWidth = true;
+GMAT Hohmann_Report.Delimiter = ' ';
+GMAT Hohmann_Report.ColumnWidth = 23;
+GMAT Hohmann_Report.WriteReport = true;
+
+
+%----------------------------------------
+%---------- Mission Sequence
+%----------------------------------------
+
+BeginMissionSequence;
+Propagate 'HohmannParkOrbit' DefaultProp(HohmannCraft) {HohmannCraft.ElapsedSecs = 8500};
+Maneuver 'HohmannGTOEntryBurn' HohmannGTOBurn(HohmannCraft);
+Propagate 'HohmannGTOMidTransfer' DefaultProp(HohmannCraft) {HohmannCraft.Earth.TA = 180};
+Maneuver 'HohmannGEOCircularizationBurn' HohmannGEOEntryBurn(HohmannCraft);
+Propagate 'HohmannGEOCheck' DefaultProp(HohmannCraft) {HohmannCraft.ElapsedDays = 2};
+Propagate 'Bi-EllipticParkOrbit' DefaultProp(BiEllipticCraft) DefaultProp(HohmannCraft) {BiEllipticCraft.ElapsedSecs = 12000.0};
+Maneuver 'BiEllipticApogeeRaiseBurn' BiEllipticApogeeRaiseBurn(BiEllipticCraft);
+Propagate 'BiEllipticTransferToApogee' DefaultProp(BiEllipticCraft) DefaultProp(HohmannCraft) {BiEllipticCraft.Earth.TA = 180};
+Maneuver 'BiEllipticPergieeRaiseBurn' BiEllipticPerigeeRaiseBurn(BiEllipticCraft);
+Propagate 'BiEllipticTransferToPerigee' DefaultProp(BiEllipticCraft) DefaultProp(HohmannCraft) {BiEllipticCraft.Earth.TA = 0};
+Maneuver 'BiEllipticCircularizeBurn' BiEllipticCircularizeBurn(BiEllipticCraft);
+Propagate 'BiEllipticGEOCheck' DefaultProp(BiEllipticCraft) DefaultProp(HohmannCraft) {BiEllipticCraft.ElapsedDays = 2};
