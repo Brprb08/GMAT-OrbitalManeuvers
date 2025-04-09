@@ -1,0 +1,483 @@
+%General Mission Analysis Tool(GMAT) Script
+%Created: 2025-04-02 13:31:32
+
+%=========================%
+%        QUICK README     %
+%=========================%
+
+%----------------------------------------
+%---------- Spacecraft
+%----------------------------------------
+% Main spacecraft config, inserted into 200 km LEO, Earth-centered frame.
+% Equipped with prograde and retrograde tanks/thrusters for TLI and LOI sequences.
+
+%----------------------------------------
+%---------- Hardware Components
+%----------------------------------------
+% Two tank/thruster pairs: 
+% - Prograde pair (for TLI & maneuvers from Earth side)
+% - Retrograde pair (for braking into lunar orbit)
+% ISP and thrust tuned for realism, ~300s ISP.
+
+%----------------------------------------
+%---------- Propagators
+%----------------------------------------
+% EarthMoonProp: PrinceDormand78, solid for Earth-Moon dynamics.
+% High-accuracy settings to keep the mission stable during coast and burns.
+
+%----------------------------------------
+%---------- Burns
+%----------------------------------------
+% TLI_Burn: Finite burn using prograde thruster, initiates Earth escape
+% LOI_Burn: Main lunar capture burn, done in lunar vicinity
+% FiniteBurn1: Used later for circularizing orbit
+% ImpulsiveBurns: Available for tuning / quick dV maneuvers (not primary)
+% TLI_VelocityMatch: Optional for refining outbound trajectory
+
+%----------------------------------------
+%---------- Coordinate Systems
+%----------------------------------------
+% MJ2000Eq for dynamic references; LunaFixed included in case surface ops are added later.
+
+%----------------------------------------
+%---------- Solvers
+%----------------------------------------
+% DifferentialCorrector (DC) handles targeting and burn tuning.
+% Using Newton-Raphson for convergence, standard setup.
+
+%----------------------------------------
+%---------- Report
+%----------------------------------------
+% Report_LunarTransfer logs key telemetry to CSV:
+% - Time
+% - Altitudes
+% - Velocity in both frames
+% - Mass, SMA, ECC, etc.
+% Everything you need to analyze burns, coast arcs, and final orbit quality.
+
+%----------------------------------------
+%---------- Variables
+%----------------------------------------
+% All timing values for burns and coast durations.
+% These are tuned through DC during mission runs.
+
+%----------------------------------------
+%---------- Mission Sequence
+%----------------------------------------
+
+%BeginMissionSequence;
+
+% ---- Phase 1: Trans-Lunar Injection ----
+% Uses DifferentialCorrector to find the right TLI window and burn length.
+% Includes:
+% - Propagation to burn point
+% - Finite burn execution
+% - Translunar coast
+% - Earth altitude condition to confirm escape achieved
+%Target 'Target_TransLunarInjection' DC ...
+%   ...
+
+% ---- Phase 2: Lunar Orbit Insertion (LOI1) ----
+% First lunar capture burn.
+% Achieves a highly elliptical lunar orbit (~ECC = 0.6).
+% Starts braking at perilune using FiniteBurn1 (Retrograde).
+%Target 'Target_LunarOrbitInsertion' DC ...
+%   ...
+
+% ---- Coast Phase ----
+% Short coast after LOI1 before initiating circularization
+%Propagate 'Propogate_LOI_Coast' ...
+
+% ---- Phase 3: Orbit Circularization (LOI2) ----
+% Final burn to reduce apolune and settle into ~100km circular orbit.
+% Target ECC = 0 (with 0.08 tolerance)
+%Target 'Target_LOI2' DC ...
+%   ...
+
+% ---- Final Coast ----
+% Allow the spacecraft to remain in stable orbit for a few days.
+
+%=========================%
+%        END README     %
+%=========================%
+
+%----------------------------------------
+%---------- Spacecraft
+%----------------------------------------
+
+Create Spacecraft SC_LunarTransfer;
+GMAT SC_LunarTransfer.DateFormat = UTCGregorian;
+GMAT SC_LunarTransfer.Epoch = '01 Jan 2025 12:00:00.000';
+GMAT SC_LunarTransfer.CoordinateSystem = EarthMJ2000Eq;
+GMAT SC_LunarTransfer.DisplayStateType = Keplerian;
+GMAT SC_LunarTransfer.SMA = 6777.999999999996;
+GMAT SC_LunarTransfer.ECC = 0;
+GMAT SC_LunarTransfer.INC = 28.49999999999999;
+GMAT SC_LunarTransfer.RAAN = 0;
+GMAT SC_LunarTransfer.AOP = 0;
+GMAT SC_LunarTransfer.TA = 0;
+GMAT SC_LunarTransfer.DryMass = 2000;
+GMAT SC_LunarTransfer.Cd = 2.2;
+GMAT SC_LunarTransfer.Cr = 1.8;
+GMAT SC_LunarTransfer.DragArea = 15;
+GMAT SC_LunarTransfer.SRPArea = 1;
+GMAT SC_LunarTransfer.SPADDragScaleFactor = 1;
+GMAT SC_LunarTransfer.SPADSRPScaleFactor = 1;
+GMAT SC_LunarTransfer.AtmosDensityScaleFactor = 1;
+GMAT SC_LunarTransfer.ExtendedMassPropertiesModel = 'None';
+GMAT SC_LunarTransfer.Tanks = {ProgradeTank, RetrogradeTank};
+GMAT SC_LunarTransfer.Thrusters = {ProgradeThruster, RetrogradeThruster};
+GMAT SC_LunarTransfer.NAIFId = -10001001;
+GMAT SC_LunarTransfer.NAIFIdReferenceFrame = -9001001;
+GMAT SC_LunarTransfer.OrbitColor = Red;
+GMAT SC_LunarTransfer.TargetColor = Teal;
+GMAT SC_LunarTransfer.OrbitErrorCovariance = [ 1e+70 0 0 0 0 0 ; 0 1e+70 0 0 0 0 ; 0 0 1e+70 0 0 0 ; 0 0 0 1e+70 0 0 ; 0 0 0 0 1e+70 0 ; 0 0 0 0 0 1e+70 ];
+GMAT SC_LunarTransfer.CdSigma = 1e+70;
+GMAT SC_LunarTransfer.CrSigma = 1e+70;
+GMAT SC_LunarTransfer.Id = 'SatId';
+GMAT SC_LunarTransfer.Attitude = CoordinateSystemFixed;
+GMAT SC_LunarTransfer.SPADSRPInterpolationMethod = Bilinear;
+GMAT SC_LunarTransfer.SPADSRPScaleFactorSigma = 1e+70;
+GMAT SC_LunarTransfer.SPADDragInterpolationMethod = Bilinear;
+GMAT SC_LunarTransfer.SPADDragScaleFactorSigma = 1e+70;
+GMAT SC_LunarTransfer.AtmosDensityScaleFactorSigma = 1e+70;
+GMAT SC_LunarTransfer.ModelFile = 'aura.3ds';
+GMAT SC_LunarTransfer.ModelOffsetX = 0;
+GMAT SC_LunarTransfer.ModelOffsetY = 0;
+GMAT SC_LunarTransfer.ModelOffsetZ = 0;
+GMAT SC_LunarTransfer.ModelRotationX = 0;
+GMAT SC_LunarTransfer.ModelRotationY = 0;
+GMAT SC_LunarTransfer.ModelRotationZ = 0;
+GMAT SC_LunarTransfer.ModelScale = 1;
+GMAT SC_LunarTransfer.AttitudeDisplayStateType = 'Quaternion';
+GMAT SC_LunarTransfer.AttitudeRateDisplayStateType = 'AngularVelocity';
+GMAT SC_LunarTransfer.AttitudeCoordinateSystem = EarthMJ2000Eq;
+GMAT SC_LunarTransfer.EulerAngleSequence = '321';
+
+%----------------------------------------
+%---------- Hardware Components
+%----------------------------------------
+
+Create ChemicalTank ProgradeTank;
+GMAT ProgradeTank.AllowNegativeFuelMass = false;
+GMAT ProgradeTank.FuelMass = 13000;
+GMAT ProgradeTank.Pressure = 1500;
+GMAT ProgradeTank.Temperature = 20;
+GMAT ProgradeTank.RefTemperature = 20;
+GMAT ProgradeTank.Volume = 11.8181818182;
+GMAT ProgradeTank.FuelDensity = 1100; % Adjust based on actual fuel used
+GMAT ProgradeTank.PressureModel = PressureRegulated;
+
+Create ChemicalThruster ProgradeThruster;
+GMAT ProgradeThruster.CoordinateSystem = Local;
+GMAT ProgradeThruster.Origin = Earth;   % Set to the spacecraft
+GMAT ProgradeThruster.Axes = VNB;
+GMAT ProgradeThruster.ThrustDirection1 = 1;
+GMAT ProgradeThruster.ThrustDirection2 = 0;
+GMAT ProgradeThruster.ThrustDirection3 = 0;
+GMAT ProgradeThruster.DutyCycle = 1;
+GMAT ProgradeThruster.ThrustScaleFactor = 2;
+GMAT ProgradeThruster.DecrementMass = true;
+GMAT ProgradeThruster.Tank = {ProgradeTank};
+GMAT ProgradeThruster.MixRatio = [ 1 ];
+GMAT ProgradeThruster.GravitationalAccel = 9.81;
+GMAT ProgradeThruster.C1 = 60000;  % Thrust = 1000 N
+GMAT ProgradeThruster.C2 = 0;
+GMAT ProgradeThruster.C3 = 0;
+GMAT ProgradeThruster.C4 = 0;
+GMAT ProgradeThruster.C5 = 0;
+GMAT ProgradeThruster.C6 = 0;
+GMAT ProgradeThruster.C7 = 0;
+GMAT ProgradeThruster.C8 = 0;
+GMAT ProgradeThruster.C9 = 0;
+GMAT ProgradeThruster.C10 = 0;
+GMAT ProgradeThruster.C11 = 0;
+GMAT ProgradeThruster.C12 = 0;
+GMAT ProgradeThruster.C13 = 0;
+GMAT ProgradeThruster.C14 = 0;
+GMAT ProgradeThruster.C15 = 0;
+GMAT ProgradeThruster.C16 = 0;
+GMAT ProgradeThruster.K1 = 300;   % ISP = 300 s
+GMAT ProgradeThruster.K2 = 0;
+GMAT ProgradeThruster.K3 = 0;
+GMAT ProgradeThruster.K4 = 0;
+GMAT ProgradeThruster.K5 = 0;
+GMAT ProgradeThruster.K6 = 0;
+GMAT ProgradeThruster.K7 = 0;
+GMAT ProgradeThruster.K8 = 0;
+GMAT ProgradeThruster.K9 = 0;
+GMAT ProgradeThruster.K10 = 0;
+GMAT ProgradeThruster.K11 = 0;
+GMAT ProgradeThruster.K12 = 0;
+GMAT ProgradeThruster.K13 = 0;
+GMAT ProgradeThruster.K14 = 0;
+GMAT ProgradeThruster.K15 = 0;
+GMAT ProgradeThruster.K16 = 0;
+
+Create ChemicalThruster RetrogradeThruster;
+GMAT RetrogradeThruster.CoordinateSystem = Local;
+GMAT RetrogradeThruster.Origin = Luna;
+GMAT RetrogradeThruster.Axes = VNB;
+GMAT RetrogradeThruster.ThrustDirection1 = -1;
+GMAT RetrogradeThruster.ThrustDirection2 = 0;
+GMAT RetrogradeThruster.ThrustDirection3 = 0;
+GMAT RetrogradeThruster.DutyCycle = 1;
+GMAT RetrogradeThruster.ThrustScaleFactor = 2;
+GMAT RetrogradeThruster.DecrementMass = true;
+GMAT RetrogradeThruster.Tank = {RetrogradeTank};
+GMAT RetrogradeThruster.MixRatio = [ 1 ];
+GMAT RetrogradeThruster.GravitationalAccel = 9.81;
+GMAT RetrogradeThruster.C1 = 10000;
+GMAT RetrogradeThruster.C2 = 0;
+GMAT RetrogradeThruster.C3 = 0;
+GMAT RetrogradeThruster.C4 = 0;
+GMAT RetrogradeThruster.C5 = 0;
+GMAT RetrogradeThruster.C6 = 0;
+GMAT RetrogradeThruster.C7 = 0;
+GMAT RetrogradeThruster.C8 = 0;
+GMAT RetrogradeThruster.C9 = 0;
+GMAT RetrogradeThruster.C10 = 0;
+GMAT RetrogradeThruster.C11 = 0;
+GMAT RetrogradeThruster.C12 = 0;
+GMAT RetrogradeThruster.C13 = 0;
+GMAT RetrogradeThruster.C14 = 0;
+GMAT RetrogradeThruster.C15 = 0;
+GMAT RetrogradeThruster.C16 = 0;
+GMAT RetrogradeThruster.K1 = 300;
+GMAT RetrogradeThruster.K2 = 0;
+GMAT RetrogradeThruster.K3 = 0;
+GMAT RetrogradeThruster.K4 = 0;
+GMAT RetrogradeThruster.K5 = 0;
+GMAT RetrogradeThruster.K6 = 0;
+GMAT RetrogradeThruster.K7 = 0;
+GMAT RetrogradeThruster.K8 = 0;
+GMAT RetrogradeThruster.K9 = 0;
+GMAT RetrogradeThruster.K10 = 0;
+GMAT RetrogradeThruster.K11 = 0;
+GMAT RetrogradeThruster.K12 = 0;
+GMAT RetrogradeThruster.K13 = 0;
+GMAT RetrogradeThruster.K14 = 0;
+GMAT RetrogradeThruster.K15 = 0;
+GMAT RetrogradeThruster.K16 = 0;
+
+Create ChemicalTank RetrogradeTank;
+GMAT RetrogradeTank.AllowNegativeFuelMass = false;
+GMAT RetrogradeTank.FuelMass = 7000;
+GMAT RetrogradeTank.Pressure = 1500;
+GMAT RetrogradeTank.Temperature = 20;
+GMAT RetrogradeTank.RefTemperature = 20;
+GMAT RetrogradeTank.Volume = 6.83;
+GMAT RetrogradeTank.FuelDensity = 1025;
+GMAT RetrogradeTank.PressureModel = PressureRegulated;
+
+%----------------------------------------
+%---------- ForceModels
+%----------------------------------------
+
+Create ForceModel Propagator1_ForceModel;
+GMAT Propagator1_ForceModel.CentralBody = Luna;
+GMAT Propagator1_ForceModel.PrimaryBodies = {Luna};
+GMAT Propagator1_ForceModel.Drag = None;
+GMAT Propagator1_ForceModel.SRP = Off;
+GMAT Propagator1_ForceModel.RelativisticCorrection = Off;
+GMAT Propagator1_ForceModel.ErrorControl = RSSStep;
+GMAT Propagator1_ForceModel.GravityField.Luna.Degree = 4;
+GMAT Propagator1_ForceModel.GravityField.Luna.Order = 4;
+GMAT Propagator1_ForceModel.GravityField.Luna.StmLimit = 100;
+GMAT Propagator1_ForceModel.GravityField.Luna.PotentialFile = 'LP165P.cof';
+GMAT Propagator1_ForceModel.GravityField.Luna.TideModel = 'None';
+
+
+
+%----------------------------------------
+%---------- ForceModels
+%----------------------------------------
+
+Create ForceModel EarthMoonForces;
+GMAT EarthMoonForces.CentralBody = Earth;
+GMAT EarthMoonForces.PointMasses = {Earth, Luna};
+GMAT EarthMoonForces.Drag = None;
+GMAT EarthMoonForces.SRP = Off;
+GMAT EarthMoonForces.RelativisticCorrection = Off;
+GMAT EarthMoonForces.ErrorControl = RSSStep;
+
+%----------------------------------------
+%---------- Propagators
+%----------------------------------------
+
+Create Propagator EarthMoonProp;
+GMAT EarthMoonProp.FM = EarthMoonForces;
+GMAT EarthMoonProp.Type = PrinceDormand78;
+GMAT EarthMoonProp.InitialStepSize = 60;
+GMAT EarthMoonProp.Accuracy = 9.999999999999999e-12;
+GMAT EarthMoonProp.MinStep = 0.1;
+GMAT EarthMoonProp.MaxStep = 300;
+GMAT EarthMoonProp.MaxStepAttempts = 50;
+GMAT EarthMoonProp.StopIfAccuracyIsViolated = false;
+
+%----------------------------------------
+%---------- Burns
+%----------------------------------------
+
+Create FiniteBurn Burn_TLI;
+GMAT Burn_TLI.Thrusters = {ProgradeThruster};
+GMAT Burn_TLI.ThrottleLogicAlgorithm = 'MaxNumberOfThrusters';
+
+Create FiniteBurn Burn_LOI;
+GMAT Burn_LOI.Thrusters = {RetrogradeThruster};
+GMAT Burn_LOI.ThrottleLogicAlgorithm = 'MaxNumberOfThrusters';
+
+Create FiniteBurn Burn_LOI2;
+GMAT Burn_LOI2.Thrusters = {RetrogradeThruster};
+GMAT Burn_LOI2.ThrottleLogicAlgorithm = 'MaxNumberOfThrusters';
+
+%----------------------------------------
+%---------- Coordinate Systems
+%----------------------------------------
+
+Create CoordinateSystem LunaMJ2000Eq;
+GMAT LunaMJ2000Eq.Origin = Luna;
+GMAT LunaMJ2000Eq.Axes = MJ2000Eq;
+
+Create CoordinateSystem LunaFixed;
+GMAT LunaFixed.Origin = Luna;
+GMAT LunaFixed.Axes = BodyFixed;
+
+%----------------------------------------
+%---------- Solvers
+%----------------------------------------
+
+Create DifferentialCorrector DC;
+GMAT DC.ShowProgress = true;
+GMAT DC.ReportStyle = Normal;
+GMAT DC.ReportFile = 'DifferentialCorrectorDC.data';
+GMAT DC.MaximumIterations = 25;
+GMAT DC.DerivativeMethod = ForwardDifference;
+GMAT DC.Algorithm = NewtonRaphson;
+
+%----------------------------------------
+%---------- Subscribers
+%----------------------------------------
+
+Create ReportFile Report_LunarTransfer;
+GMAT Report_LunarTransfer.SolverIterations = Current;
+GMAT Report_LunarTransfer.UpperLeft = [ 0.3005882352941177 0.1141826923076923 ];
+GMAT Report_LunarTransfer.Size = [ 0.5388235294117647 0.640625 ];
+GMAT Report_LunarTransfer.RelativeZOrder = 120;
+GMAT Report_LunarTransfer.Maximized = false;
+GMAT Report_LunarTransfer.Filename = 'LEO_to_LLO_Report.csv';
+GMAT Report_LunarTransfer.Precision = 10;
+GMAT Report_LunarTransfer.Add = {SC_LunarTransfer.ElapsedSecs, SC_LunarTransfer.Luna.Altitude, SC_LunarTransfer.Earth.Altitude, SC_LunarTransfer.LunaMJ2000Eq.VMAG, SC_LunarTransfer.EarthMJ2000Eq.VMAG, SC_LunarTransfer.TotalMass, SC_LunarTransfer.SMA, SC_LunarTransfer.ECC, SC_LunarTransfer.INC, SC_LunarTransfer.DryMass};
+GMAT Report_LunarTransfer.WriteHeaders = true;
+GMAT Report_LunarTransfer.LeftJustify = On;
+GMAT Report_LunarTransfer.ZeroFill = Off;
+GMAT Report_LunarTransfer.FixedWidth = true;
+GMAT Report_LunarTransfer.Delimiter = ' ';
+GMAT Report_LunarTransfer.ColumnWidth = 23;
+GMAT Report_LunarTransfer.WriteReport = true;
+
+Create OrbitView LunarTransferOrbitView;
+GMAT LunarTransferOrbitView.SolverIterations = Current;
+GMAT LunarTransferOrbitView.UpperLeft = [ 0.08941176470588236 0.2752403846153846 ];
+GMAT LunarTransferOrbitView.Size = [ 0.5611764705882353 0.6586538461538461 ];
+GMAT LunarTransferOrbitView.RelativeZOrder = 122;
+GMAT LunarTransferOrbitView.Maximized = false;
+GMAT LunarTransferOrbitView.Add = {SC_LunarTransfer, Earth, Luna};
+GMAT LunarTransferOrbitView.CoordinateSystem = EarthMJ2000Eq;
+GMAT LunarTransferOrbitView.DrawObject = [ true true true ];
+GMAT LunarTransferOrbitView.DataCollectFrequency = 1;
+GMAT LunarTransferOrbitView.UpdatePlotFrequency = 50;
+GMAT LunarTransferOrbitView.NumPointsToRedraw = 0;
+GMAT LunarTransferOrbitView.ShowPlot = true;
+GMAT LunarTransferOrbitView.MaxPlotPoints = 20000;
+GMAT LunarTransferOrbitView.ShowLabels = true;
+GMAT LunarTransferOrbitView.ViewPointReference = Earth;
+GMAT LunarTransferOrbitView.ViewPointVector = [ 0 0 30000 ];
+GMAT LunarTransferOrbitView.ViewDirection = Earth;
+GMAT LunarTransferOrbitView.ViewScaleFactor = 1;
+GMAT LunarTransferOrbitView.ViewUpCoordinateSystem = EarthMJ2000Eq;
+GMAT LunarTransferOrbitView.ViewUpAxis = Z;
+GMAT LunarTransferOrbitView.EclipticPlane = Off;
+GMAT LunarTransferOrbitView.XYPlane = Off;
+GMAT LunarTransferOrbitView.WireFrame = Off;
+GMAT LunarTransferOrbitView.Axes = Off;
+GMAT LunarTransferOrbitView.Grid = Off;
+GMAT LunarTransferOrbitView.SunLine = Off;
+GMAT LunarTransferOrbitView.UseInitialView = On;
+GMAT LunarTransferOrbitView.StarCount = 7000;
+GMAT LunarTransferOrbitView.EnableStars = Off;
+GMAT LunarTransferOrbitView.EnableConstellations = Off;
+
+%----------------------------------------
+%---------- Arrays, Variables, Strings
+%----------------------------------------
+Create Variable TLI_BurnStartTime LOI_BurnDuration TLI_BurnDuration TLI_CoastDuration CircularizationCoastDuration LOI_CoastAfterBurn CircularizationBurnStartTime;
+GMAT TLI_BurnStartTime = 800;  % Burn duration in seconds for TLI
+GMAT LOI_BurnDuration = 500;  % Burn duration in seconds for LOI
+GMAT TLI_BurnDuration = 300;
+GMAT TLI_CoastDuration = 5;
+GMAT CircularizationCoastDuration = 5000;
+GMAT LOI_CoastAfterBurn = 1000;
+GMAT CircularizationBurnStartTime = 500;
+
+
+
+%----------------------------------------
+%---------- Mission Sequence
+%----------------------------------------
+
+BeginMissionSequence;
+
+%---- Trans-Lunar Injection (TLI) Phase ----
+Target 'Target_TransLunarInjection' DC {SolveMode = Solve, ExitMode = DiscardAndContinue, ShowProgressWindow = true};
+   Vary 'Vary_TLIStartTime' DC(TLI_BurnStartTime = 2722.99350484, {Perturbation = 1, Lower = 700, Upper = 3000, MaxStep = 100, AdditiveScaleFactor = 0.0, MultiplicativeScaleFactor = 1.0});
+   Vary 'Vary_TLIDuration' DC(TLI_BurnDuration = 441.54494555, {Perturbation = .1, Lower = 0, Upper = 450, MaxStep = 100, AdditiveScaleFactor = 0.0, MultiplicativeScaleFactor = 1.0});
+   Vary 'Vary_TLICoastTime' DC(TLI_CoastDuration = 4.90252272638, {Perturbation = .1, Lower = 4.8, Upper = 5.7, MaxStep = 10, AdditiveScaleFactor = 0.0, MultiplicativeScaleFactor = 1.0});
+   Propagate 'Propogate_To_TLI' EarthMoonProp(SC_LunarTransfer) {SC_LunarTransfer.ElapsedSecs = TLI_BurnStartTime};
+   BeginFiniteBurn 'Begin_TLI_Burn' Burn_TLI(SC_LunarTransfer);
+   Propagate 'Propogate_During_TLI' EarthMoonProp(SC_LunarTransfer) {SC_LunarTransfer.ElapsedSecs = TLI_BurnDuration};
+   EndFiniteBurn 'End_TLI_Burn' Burn_TLI(SC_LunarTransfer);
+   Propagate 'Propogate_TLI_Coast' EarthMoonProp(SC_LunarTransfer) {SC_LunarTransfer.ElapsedDays = TLI_CoastDuration};%   Achieve 'Achieve_LunarAltitude' DC(MoonMissionSC.Luna.Altitude = 17000, {Tolerance = 3000});
+   Achieve 'Achieve_EarthDepartureCondition' DC(SC_LunarTransfer.Earth.Altitude = 365000, {Tolerance = 1000});
+EndTarget;  % For targeter DC
+Target 'Target_LunarOrbitInsertion' DC {SolveMode = Solve, ExitMode = DiscardAndContinue, ShowProgressWindow = true};
+   Vary 'Vary_LOIDuration' DC(LOI_BurnDuration = 195, {Perturbation = 1, Lower = 194, Upper = 196, MaxStep = 10, AdditiveScaleFactor = 0.0, MultiplicativeScaleFactor = 1.0});
+   Vary 'Vary_LOICoastTime' DC(LOI_CoastAfterBurn = 0.05, {Perturbation = .1, Lower = 0.0, Upper = .1, MaxStep = 0.2, AdditiveScaleFactor = 0.0, MultiplicativeScaleFactor = 1.0});
+   BeginFiniteBurn 'Begin_LOI_Burn' Burn_LOI(SC_LunarTransfer);
+   Propagate 'Propogate_During_LOI' EarthMoonProp(SC_LunarTransfer) {SC_LunarTransfer.ElapsedSecs = LOI_BurnDuration};
+   EndFiniteBurn 'End_LOI_Burn' Burn_LOI(SC_LunarTransfer);
+   Propagate 'Propogate_Post_LOI' EarthMoonProp(SC_LunarTransfer) {SC_LunarTransfer.ElapsedDays = LOI_CoastAfterBurn};
+   Achieve 'Achieve_LOIEccentricity' DC(SC_LunarTransfer.Luna.ECC = .6, {Tolerance = .4});
+EndTarget;  % For targeter DC
+Propagate 'Propogate_LOI_Coast' EarthMoonProp(SC_LunarTransfer) {SC_LunarTransfer.ElapsedDays = 0.64166933209};
+Target 'Target_LOI2' DC {SolveMode = Solve, ExitMode = DiscardAndContinue, ShowProgressWindow = true};
+   Vary 'Vary_LOI2Duration' DC(CircularizationBurnStartTime = 287.277160345, {Perturbation = .1, Lower = 25, Upper = 300, MaxStep = 10, AdditiveScaleFactor = 0.0, MultiplicativeScaleFactor = 1.0});
+   Vary 'Vary_LOI2CoastTime' DC(CircularizationCoastDuration = 0.7, {Perturbation = 0.0001, Lower = 0.10, Upper = 3.14159, MaxStep = 0.2, AdditiveScaleFactor = 0.0, MultiplicativeScaleFactor = 1.0});
+   BeginFiniteBurn 'Begin_LOI2_Burn' Burn_LOI2(SC_LunarTransfer);
+   Propagate 'Propogate_During_LOI2' EarthMoonProp(SC_LunarTransfer) {SC_LunarTransfer.ElapsedSecs = CircularizationBurnStartTime};
+   EndFiniteBurn 'End_LOI2_Burn' Burn_LOI2(SC_LunarTransfer);
+   Propagate 'Propogate_Post_LOI2' EarthMoonProp(SC_LunarTransfer) {SC_LunarTransfer.ElapsedDays = CircularizationCoastDuration};
+   Achieve 'Achieve_LowLunarOrbit' DC(SC_LunarTransfer.Luna.ECC = 0, {Tolerance = 0.08});
+EndTarget;  % For targeter DC
+Propagate 'Propogate_StableOrbitCoast' EarthMoonProp(SC_LunarTransfer) {SC_LunarTransfer.ElapsedDays = 3};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
