@@ -6,12 +6,6 @@
 %=========================%
 
 %----------------------------------------
-%---------- Spacecraft
-%----------------------------------------
-% Main spacecraft config, inserted into 200 km LEO, Earth-centered frame.
-% Equipped with prograde and retrograde tanks/thrusters for TLI and LOI sequences.
-
-%----------------------------------------
 %---------- Hardware Components
 %----------------------------------------
 % Two tank/thruster pairs: 
@@ -28,16 +22,9 @@
 %----------------------------------------
 %---------- Burns
 %----------------------------------------
-% TLI_Burn: Finite burn using prograde thruster, initiates Earth escape
-% LOI_Burn: Main lunar capture burn, done in lunar vicinity
-% FiniteBurn1: Used later for circularizing orbit
-% ImpulsiveBurns: Available for tuning / quick dV maneuvers (not primary)
-% TLI_VelocityMatch: Optional for refining outbound trajectory
-
-%----------------------------------------
-%---------- Coordinate Systems
-%----------------------------------------
-% MJ2000Eq for dynamic references; LunaFixed included in case surface ops are added later.
+% Burn_TLI: Finite burn using prograde thruster, initiates Earth escape
+% Burn_LOI: Main lunar capture burn, done in lunar vicinity
+% Burn_LOI2: Used later for circularizing orbit
 
 %----------------------------------------
 %---------- Solvers
